@@ -1,101 +1,89 @@
-const Event = require("../models/Event");
-
-// @desc    Get all events
-// @route   GET /api/events
-// @access  Public
-const getEvents = async (req, res) => {
-  try {
-    const events = await Event.find({}).sort({ createdAt: -1 });
-    res.status(200).json(events);
-  } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+let events = [
+  {
+    id: 1,
+    title: "Tech Fest 2026",
+    description: "A technology event for students.",
+    date: "2026-11-15",
+    time: "10:00",
+    location: "Mumbai",
+  },
+  {
+    id: 2,
+    title: "React Workshop",
+    description: "Learn React from basics to advanced.",
+    date: "2026-11-20",
+    time: "14:00",
+    location: "Pune",
+  },
+  {
+    id: 3,
+    title: "AI Conference",
+    description: "Explore the latest AI developments.",
+    date: "2026-11-25",
+    time: "09:30",
+    location: "Bengaluru",
   }
-};
+];
 
-// @desc    Get single event by ID
-// @route   GET /api/events/:id
-// @access  Public
-const getEventById = async (req, res) => {
-  try {
-    const event = await Event.findById(req.params.id);
+// GET /api/events
+function getEvents(req, res) {
+  res.status(200).json(events);
+}
 
-    if (!event) {
-      return res.status(404).json({ message: "Event not found" });
-    }
-
-    res.status(200).json(event);
-  } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+// GET /api/events/:id
+function getEventById(req, res) {
+  const id = Number(req.params.id);
+  const event = events.find((event) => event.id === id);
+  if (!event) {
+    return res.status(404).json({ message: "Event not found" });
   }
-};
+  res.status(200).json(event);
+}
 
-// @desc    Create a new event
-// @route   POST /api/events
-// @access  Public
-const createEvent = async (req, res) => {
-  try {
-    const { title, description, date, location, category, organizer } = req.body;
-
-    if (!title || !description || !date || !location) {
-      return res.status(400).json({ message: "Please fill all required fields" });
-    }
-
-    const event = await Event.create({
-      title,
-      description,
-      date,
-      location,
-      category: category || "Other",
-      organizer: organizer || "Admin",
-    });
-
-    res.status(201).json(event);
-  } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+// POST /api/events
+function createEvent(req, res) {
+  const { title, description, date, time, location } = req.body;
+  if (!title?.trim() || !description?.trim() || !date?.trim() || !time?.trim() || !location?.trim()) {
+    return res.status(400).json({ message: "All event fields are required" });
   }
-};
+  const newEvent = {
+    id: events.length ? Math.max(...events.map((event) => event.id)) + 1 : 1,
+    title: title.trim(),
+    description: description.trim(),
+    date: date.trim(),
+    time: time.trim(),
+    location: location.trim(),
+  };
+  events.push(newEvent);
+  res.status(201).json({ message: "Event created successfully", event: newEvent });
+}
 
-// @desc    Update an event
-// @route   PUT /api/events/:id
-// @access  Public
-const updateEvent = async (req, res) => {
-  try {
-    const event = await Event.findById(req.params.id);
-
-    if (!event) {
-      return res.status(404).json({ message: "Event not found" });
-    }
-
-    const updatedEvent = await Event.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
-
-    res.status(200).json(updatedEvent);
-  } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+// PUT /api/events/:id
+function updateEvent(req, res) {
+  const id = Number(req.params.id);
+  const index = events.findIndex((event) => event.id === id);
+  if (index === -1) {
+    return res.status(404).json({ message: "Event not found" });
   }
-};
-
-// @desc    Delete an event
-// @route   DELETE /api/events/:id
-// @access  Public
-const deleteEvent = async (req, res) => {
-  try {
-    const event = await Event.findById(req.params.id);
-
-    if (!event) {
-      return res.status(404).json({ message: "Event not found" });
-    }
-
-    await Event.findByIdAndDelete(req.params.id);
-
-    res.status(200).json({ message: "Event removed successfully", id: req.params.id });
-  } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+  const { title, description, date, time, location } = req.body;
+  if (!title?.trim() || !description?.trim() || !date?.trim() || !time?.trim() || !location?.trim()) {
+    return res.status(400).json({ message: "All event fields are required" });
   }
-};
+  events[index] = { id, title: title.trim(), description: description.trim(), date: date.trim(), time: time.trim(), location: location.trim() };
+  res.status(200).json({ message: "Event updated successfully", event: events[index] });
+}
+
+// DELETE /api/events/:id
+function deleteEvent(req, res) {
+  const id = Number(req.params.id);
+  const index = events.findIndex((event) => event.id === id);
+  if (index === -1) {
+    return res.status(404).json({ message: "Event not found" });
+  }
+  const deletedEvent = events[index];
+  events = events.filter((event) => event.id !== id);
+  res.status(200).json({ message: "Event deleted successfully", event: deletedEvent });
+}
 
 module.exports = {
   getEvents,

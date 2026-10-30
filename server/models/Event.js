@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 const eventSchema = new mongoose.Schema(
   {
+    id: {
+      type: Number,
+      unique: true,
+    },
     title: {
       type: String,
       required: [true, "Please add a title"],
@@ -14,18 +18,13 @@ const eventSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please add a date"],
     },
+    time: {
+      type: String,
+      default: "10:00",
+    },
     location: {
       type: String,
       required: [true, "Please add a location"],
-    },
-    category: {
-      type: String,
-      enum: ["Technology", "Workshop", "Conference", "Festival", "Sports", "Other"],
-      default: "Other",
-    },
-    organizer: {
-      type: String,
-      default: "Admin",
     },
   },
   {

@@ -1,37 +1,27 @@
 const express = require("express");
-const dotenv = require("dotenv");
 const cors = require("cors");
-const connectDB = require("./config/db");
-const { notFound, errorHandler } = require("./middleware/errorMiddleware");
-
-// Load environment variables
-dotenv.config();
-
-// Connect to MongoDB
-connectDB();
-
 const app = express();
+const eventRoutes = require("./routes/eventRoutes");
 
-// Middleware
-app.use(cors());
+// Middleware to read JSON request bodies
 app.use(express.json());
+app.use(cors());
 
-// Routes
-app.use("/api/events", require("./routes/eventRoutes"));
-app.use("/api/auth", require("./routes/authRoutes"));
-app.use("/api/registrations", require("./routes/registrationRoutes"));
-
-// Root route
+// Home route
 app.get("/", (req, res) => {
-  res.json({ message: "Event Management System API is running" });
+  res.status(200).send("Event Management API Running");
 });
 
-// Error handling middleware
-app.use(notFound);
-app.use(errorHandler);
+// Event API routes
+app.use("/api/events", eventRoutes);
+
+// Handle unknown routes
+app.use((req, res) => {
+  res.status(404).json({ message: "Route not found" });
+});
 
 // Start server
-const PORT = process.env.PORT || 5000;
+const PORT = 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running at http://localhost:${PORT}`);
 });

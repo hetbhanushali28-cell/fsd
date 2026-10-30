@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function EventCard({ title, description, date, location }) {
+function EventCard({ title, description, date, time, location }) {
   const [registered, setRegistered] = useState(false);
 
   return (
@@ -11,9 +11,11 @@ function EventCard({ title, description, date, location }) {
       <p className="mt-2 text-slate-600">
         {description}
       </p>
-
       <p className="mt-3 text-slate-600">
         Date: {date}
+      </p>
+      <p className="text-slate-600">
+        Time: {time}
       </p>
       <p className="text-slate-600">
         Location: {location}
@@ -34,5 +36,4 @@ function EventCard({ title, description, date, location }) {
     </div>
   );
 }
-
 export default EventCard;
